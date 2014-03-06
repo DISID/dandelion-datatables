@@ -43,6 +43,7 @@ import com.github.dandelion.datatables.core.html.HtmlTable;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -76,6 +77,9 @@ public class PdfExport implements DatatablesExport {
 		try {
 			pdfWriter = PdfWriter.getInstance(document, output);
 			pdfWriter.setViewerPreferences(PdfWriter.PageLayoutSinglePage);
+                        
+                        // gvNIX. Set always landscape (http://dandelion-forum.48353.x6.nabble.com/PDF-Export-in-landscape-td1079.html)
+                        document.setPageSize(PageSize.A4.rotate());
 
 			document.open();
 			addTitle(document);
