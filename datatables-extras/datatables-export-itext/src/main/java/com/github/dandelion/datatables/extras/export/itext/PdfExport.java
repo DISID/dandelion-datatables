@@ -59,6 +59,7 @@ public class PdfExport implements DatatablesExport {
 
 	private HtmlTable htmlTable;
 	private ExportConf exportConf;
+	private String titleText = "";
 
 	@Override
 	public void initExport(HtmlTable table) {
@@ -93,7 +94,7 @@ public class PdfExport implements DatatablesExport {
 	}
 
 	private void addTitle(Document document) throws DocumentException{
-		Paragraph title = new Paragraph("Export");
+		Paragraph title = new Paragraph(titleText);
 		title.add(new Paragraph(" ")); // empty line
 		title.setAlignment(Element.ALIGN_CENTER);
 	    document.add(title);
@@ -161,5 +162,9 @@ public class PdfExport implements DatatablesExport {
 			
 			document.add(table);
 		}
+	}
+
+	public void setTitle(String title) {
+		this.titleText = title;
 	}
 }
