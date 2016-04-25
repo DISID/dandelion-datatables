@@ -72,6 +72,8 @@
       <maven.site.version>3.1</maven.site.version>
       <maven.surefire.version>2.13</maven.surefire.version>
       <maven.gpg.version>1.4</maven.gpg.version>
+      
+      <additionalparam>-Xdoclint:none</additionalparam>
    </properties>
 
    <dependencyManagement>

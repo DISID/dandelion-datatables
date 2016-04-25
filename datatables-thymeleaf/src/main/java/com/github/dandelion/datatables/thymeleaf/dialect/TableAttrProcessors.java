@@ -145,7 +145,7 @@ public enum TableAttrProcessors {
 
    public AbstractTableAttrProcessor getProcessor() {
       AttributeNameProcessorMatcher matcher = new AttributeNameProcessorMatcher(attributeName, elementNameFilter,
-            DataTablesDialect.DIALECT_PREFIX + ":table", "true");
+    		  DataTablesDialect.getDatatableAtributesByNameFilter("table", "true"));
       try {
          return processorClass.getDeclaredConstructor(IAttributeNameProcessorMatcher.class).newInstance(matcher);
       }

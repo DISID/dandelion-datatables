@@ -120,7 +120,7 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
       Map<String, Map<ConfType, Object>> configs = (Map<String, Map<ConfType, Object>>) RequestUtils.getFromRequest(
             DataTablesDialect.INTERNAL_BEAN_CONFIGS, request);
 
-      String tableId = ((Element) element.getParent()).getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":conf");
+      String tableId = DataTablesDialect.getDatatablesAttributeValue((Element) element.getParent(), "conf");
 
       String confTypeStr = AttributeUtils.parseStringAttribute(arguments, element, attributeName);
       ConfType confType = null;
@@ -161,10 +161,9 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
       Element parent = (Element) element.getParent();
 
       if (parent == null || !"div".equals(parent.getNormalizedName())
-            || !parent.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":conf")
-            || StringUtils.isBlank(parent.getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":conf"))) {
+            || !DataTablesDialect.hasDatatablesAttribute(parent, "conf")) {
          throw new DandelionException(
-               "The element 'div dt:confType=\"...\"' must be inside an element 'div dt:conf=\"tableId\"'.");
+               "The element 'div dt:confType=\"...\"' or 'div data-dt-confType=\"...\"' must be inside an element 'div dt:conf=\"tableId\"' or 'div data-dt-conf=\"tableId\"'.");
       }
    }
 
@@ -221,8 +220,8 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
          // We add a fake div here, in order to be able to get the content
          // processed
          Element div = new Element("div");
-         div.setAttribute(DataTablesDialect.DIALECT_PREFIX + ":tmp", "internalUseExtraHtml");
-         div.setAttribute(DataTablesDialect.DIALECT_PREFIX + ":uid", extraHtml.getUid());
+         div.setAttribute(DataTablesDialect.getXMLDatatablesAttribute("tmp"), "internalUseExtraHtml");
+         div.setAttribute(DataTablesDialect.getXMLDatatablesAttribute("uid"), extraHtml.getUid());
          element.getParent().addChild(div);
 
       }
@@ -247,18 +246,18 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
       String exportFormat = null;
 
       if (hasAttribute(element, "type")) {
-         exportFormat = element.getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":type").trim().toLowerCase();
+         exportFormat = DataTablesDialect.getDatatablesAttributeValue(element, "type").trim().toLowerCase();
          conf = new ExportConf(exportFormat);
       }
       else {
-         throw new DandelionException("The attribute 'dt:type' is required when defining an export configuration.");
+         throw new DandelionException("The attribute 'dt:type' or 'data-dt-type' is required when defining an export configuration.");
       }
 
       StringBuilder exportUrl = null;
       // Custom mode (export using controller)
-      if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":url")) {
-         exportUrl = new StringBuilder(AttributeUtils.parseStringAttribute(arguments, element,
-               DataTablesDialect.DIALECT_PREFIX + ":url").trim());
+      if (DataTablesDialect.hasDatatablesAttribute(element, "url")) {
+         exportUrl = new StringBuilder(AttributeUtils.parseDatatablesStringAttribute(arguments, element,
+               "url").trim());
          UrlUtils.addParameter(exportUrl, ExportUtils.DDL_DT_REQUESTPARAM_EXPORT_TYPE, "c");
          conf.setHasCustomUrl(true);
       }
@@ -300,7 +299,7 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
       }
 
       if (hasAttribute(element, "method")) {
-         String methodStr = element.getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":method");
+         String methodStr = DataTablesDialect.getDatatablesAttributeValue(element, "method");
 
          HttpMethod methodEnum = null;
          try {
@@ -335,7 +334,7 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
       }
 
       if (hasAttribute(element, "orientation")) {
-         String orientationStr = element.getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":orientation");
+         String orientationStr = DataTablesDialect.getDatatablesAttributeValue(element, "orientation");
 
          Orientation orientationEnum = null;
          try {
@@ -427,13 +426,15 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
             }
          }
          else {
-            throw new DandelionException("The attribute '" + DataTablesDialect.DIALECT_PREFIX
-                  + ":function' is required when defining a callback.");
+            throw new DandelionException("The attribute '" + DataTablesDialect.getHTML5DatatablesAttribute("function")
+                  + "' or '" + DataTablesDialect.getXMLDatatablesAttribute("function")
+                  + "' is required when defining a callback.");
          }
       }
       else {
-         throw new DandelionException("The attribute '" + DataTablesDialect.DIALECT_PREFIX
-               + ":type' is required when defining a callback.");
+          throw new DandelionException("The attribute '" + DataTablesDialect.getHTML5DatatablesAttribute("type")
+          + "' or '" + DataTablesDialect.getXMLDatatablesAttribute("type")
+          + "' is required when defining a callback.");
       }
    }
 
@@ -449,8 +450,7 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
 
       if (hasAttribute(element, "bundles")) {
 
-         String bundles = AttributeUtils.parseStringAttribute(arguments, element, DataTablesDialect.DIALECT_PREFIX
-               + ":bundles");
+         String bundles = AttributeUtils.parseDatatablesStringAttribute(arguments, element, "bundles");
          JQueryContentPlaceholder placeholder = null;
 
          if (hasAttribute(element, "placeholder")) {
@@ -526,11 +526,11 @@ public class DivConfTypeAttrProcessor extends AbstractAttrProcessor {
    }
 
    public boolean hasAttribute(Element element, String attribute) {
-      return element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":" + attribute)
-            && StringUtils.isNotBlank(element.getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":" + attribute));
+      return DataTablesDialect.hasDatatablesAttribute(element, attribute)
+            && StringUtils.isNotBlank(DataTablesDialect.getDatatablesAttributeValue(element, attribute));
    }
 
    public String getStringValue(Element element, String attribute) {
-      return String.valueOf(element.getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":" + attribute));
+      return String.valueOf(DataTablesDialect.getDatatablesAttributeValue(element, attribute));
    }
 }

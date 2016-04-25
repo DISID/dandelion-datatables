@@ -29,14 +29,18 @@
  */
 package com.github.dandelion.datatables.thymeleaf.dialect;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.thymeleaf.dialect.AbstractDialect;
+import org.thymeleaf.dom.Element;
 import org.thymeleaf.processor.AttributeNameProcessorMatcher;
 import org.thymeleaf.processor.ElementNameProcessorMatcher;
 import org.thymeleaf.processor.IProcessor;
 
+import com.github.dandelion.core.util.StringUtils;
 import com.github.dandelion.datatables.thymeleaf.processor.config.DivConfAttrProcessor;
 import com.github.dandelion.datatables.thymeleaf.processor.config.DivConfTypeAttrProcessor;
 import com.github.dandelion.datatables.thymeleaf.processor.el.ColumnFinalizerProcessor;
@@ -56,7 +60,7 @@ import com.github.dandelion.datatables.thymeleaf.processor.el.TrElProcessor;
  */
 public class DataTablesDialect extends AbstractDialect {
 
-   public static final String DIALECT_PREFIX = "dt";
+   private static final String DIALECT_PREFIX = "dt";
    public static final String LAYOUT_NAMESPACE = "http://www.thymeleaf.org/dandelion/datatables";
    public static final int DT_HIGHEST_PRECEDENCE = 3500;
    public static final int DT_DEFAULT_PRECEDENCE = 8000;
@@ -88,21 +92,21 @@ public class DataTablesDialect extends AbstractDialect {
 
       // Element processors
       processors.add(new TableInitializerElProcessor(
-            new ElementNameProcessorMatcher("table", DIALECT_PREFIX + ":table", "true", false)));
+            new ElementNameProcessorMatcher("table", getDatatableAtributesByNameFilter("table", "true"), false)));
       processors.add(new TableFinalizerElProcessor(
-            new ElementNameProcessorMatcher("div", DIALECT_PREFIX + ":tmp", "internalUse", false)));
+            new ElementNameProcessorMatcher("div", getXMLDatatablesAttribute("tmp"), "internalUse", false)));
       processors.add(new TheadElProcessor(
-            new ElementNameProcessorMatcher("thead", DIALECT_PREFIX + ":data", "internalUse", false)));
+            new ElementNameProcessorMatcher("thead", getXMLDatatablesAttribute("data"), "internalUse", false)));
       processors.add(new TbodyElProcessor(
-            new ElementNameProcessorMatcher("tbody", DIALECT_PREFIX + ":data", "internalUse", false)));
+            new ElementNameProcessorMatcher("tbody", getXMLDatatablesAttribute("data"), "internalUse", false)));
       processors.add(new ColumnInitializerElProcessor(
-            new ElementNameProcessorMatcher("th", DIALECT_PREFIX + ":data", "internalUse", false)));
+            new ElementNameProcessorMatcher("th", getXMLDatatablesAttribute("data"), "internalUse", false)));
       processors.add(new ColumnFinalizerProcessor(
-            new ElementNameProcessorMatcher("th", DIALECT_PREFIX + ":data", "internalUse", false)));
+            new ElementNameProcessorMatcher("th", getXMLDatatablesAttribute("data"), "internalUse", false)));
       processors.add(
-            new TrElProcessor(new ElementNameProcessorMatcher("tr", DIALECT_PREFIX + ":data", "internalUse", false)));
+            new TrElProcessor(new ElementNameProcessorMatcher("tr", getXMLDatatablesAttribute("data"), "internalUse", false)));
       processors.add(
-            new TdElProcessor(new ElementNameProcessorMatcher("td", DIALECT_PREFIX + ":data", "internalUse", false)));
+            new TdElProcessor(new ElementNameProcessorMatcher("td", getXMLDatatablesAttribute("data"), "internalUse", false)));
 
       // Config processors
       processors.add(new DivConfAttrProcessor(new AttributeNameProcessorMatcher("conf", "div")));
@@ -122,4 +126,51 @@ public class DataTablesDialect extends AbstractDialect {
 
       return processors;
    }
+
+	public static String getXMLDatatablesAttribute(String action) {
+		return DIALECT_PREFIX + ":" + action;
+	}
+
+	public static String getHTML5DatatablesAttribute(String action) {
+		return "data-" + DIALECT_PREFIX + "-" + action;
+	}
+
+	private static boolean hasAttribute(Element element, String attribute) {
+		return (element.hasAttribute(attribute) && !StringUtils.isBlank(element.getAttributeValue(attribute)));
+	}
+
+	public static boolean hasDatatablesAttribute(Element element, String action) {
+		return hasAttribute(element, getXMLDatatablesAttribute(action))
+				|| hasAttribute(element, getHTML5DatatablesAttribute(action));
+	}
+	
+	public static String getDatatablesAttributeValue(Element element, String action) {
+		String attribute = getXMLDatatablesAttribute(action);
+		String value = element.getAttributeValue(attribute);
+		if (value == null) {
+			attribute = getHTML5DatatablesAttribute(action);
+			value = element.getAttributeValue(attribute);
+		}
+		return value;
+	}
+	
+	public static Map<String, String> getDatatableAtributesByNameFilter(String action, String value) {
+		Map<String, String> filter = new HashMap<String, String>(2);
+		filter.put(getXMLDatatablesAttribute(action), value);
+		filter.put(getHTML5DatatablesAttribute(action), value);
+		return filter;
+	}
+	
+	public static void removeDatatablesAttribute(Element element, String action) {
+		element.removeAttribute(getXMLDatatablesAttribute(action));
+		element.removeAttribute(getHTML5DatatablesAttribute(action));
+	}
+
+	public static void removeDatatablesAttributeIfExists(Element element, String action) {
+		if (hasDatatablesAttribute(element, action)) {
+			element.removeAttribute(getXMLDatatablesAttribute(action));
+			element.removeAttribute(getHTML5DatatablesAttribute(action));
+		}
+	}
+
 }

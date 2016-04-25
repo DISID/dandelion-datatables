@@ -45,6 +45,7 @@ import com.github.dandelion.datatables.core.extension.feature.SortType;
 import com.github.dandelion.datatables.core.extension.theme.Theme;
 import com.github.dandelion.datatables.core.extension.theme.ThemeOption;
 import com.github.dandelion.datatables.core.generator.YadcfConfigGenerator.FilterType;
+import com.github.dandelion.datatables.thymeleaf.dialect.DataTablesDialect;
 
 /**
  * <p>
@@ -89,6 +90,68 @@ public class AttributeUtils {
 
    /**
     * <p>
+    * Parses a String as a {@link Boolean}.
+    * </p>
+    * 
+    * @param arguments
+    *           Thymeleaf {@link Arguments}
+    * @param element
+    *           The element in which an attribute is to be parsed.
+    * @param value
+    *           The value to be parsed.
+    * @return A Boolean which is evaluated :
+    *         <ul>
+    *         <li>either using the "true" or "false" strings</li>
+    *         <li>or using the default value if the expression to parse is null
+    *         </li>
+    *         <li>or using the Standard Thymeleaf Expression in all other cases
+    *         </li>
+    *         </ul>
+    */
+   private static Boolean parseBooleanAttribute(Arguments arguments, String value) {
+
+      // Handling null value
+      if (value == null) {
+         return null;
+      }
+
+      if (booleanRegex.matcher(value).find()) {
+         return Boolean.parseBoolean(value.trim().toLowerCase());
+      }
+
+      // Default behaviour
+      return processStandardExpression(arguments, value, Boolean.class);
+   }
+   
+   /**
+    * <p>
+    * Parses the value of a Datatables Dialect action as a {@link Boolean}.
+    * </p>
+    * 
+    * @param arguments
+    *           Thymeleaf {@link Arguments}
+    * @param element
+    *           The element in which an attribute is to be parsed.
+    * @param action
+    *           The action name for which the value is to be parsed.
+    * @return A Boolean which is evaluated :
+    *         <ul>
+    *         <li>either using the "true" or "false" strings</li>
+    *         <li>or using the default value if the expression to parse is null
+    *         </li>
+    *         <li>or using the Standard Thymeleaf Expression in all other cases
+    *         </li>
+    *         </ul>
+    */
+   public static Boolean parseDatatablesBooleanAttribute(Arguments arguments, Element element, String action) {
+
+      String value = DataTablesDialect.getDatatablesAttributeValue(element, action);
+
+      return parseBooleanAttribute(arguments, value);
+   }
+
+   /**
+    * <p>
     * Parses the value of an attribute as a {@link Boolean}.
     * </p>
     * 
@@ -111,17 +174,67 @@ public class AttributeUtils {
 
       String value = element.getAttributeValue(attributeName);
 
+      return parseBooleanAttribute(arguments, value);
+   }
+
+   /**
+    * <p>
+    * Parses a String as a {@link String}.
+    * </p>
+    * 
+    * @param arguments
+    *           Thymeleaf {@link Arguments}
+    * @param value
+    *           The value to be parsed.
+    * @return A string which is evaluated :
+    *         <ul>
+    *         <li>either using a specific case (e.g. asc/desc)</li>
+    *         <li>or using the default value if the expression to parse is null
+    *         </li>
+    *         <li>or using the Standard Thymeleaf Expression in all other cases
+    *         </li>
+    *         </ul>
+    */
+   private static String parseStringAttribute(Arguments arguments, String value) {
+
       // Handling null value
       if (value == null) {
          return null;
       }
 
-      if (booleanRegex.matcher(value).find()) {
-         return Boolean.parseBoolean(value.trim().toLowerCase());
+      if (stringRegex.matcher(value.trim().toLowerCase()).find()) {
+         return value.trim().toLowerCase();
       }
 
       // Default behaviour
-      return processStandardExpression(arguments, value, Boolean.class);
+      return processStandardExpression(arguments, value, String.class);
+   }
+   
+   /**
+    * <p>
+    * Parses the value of an attribute as a {@link String}.
+    * </p>
+    * 
+    * @param arguments
+    *           Thymeleaf {@link Arguments}
+    * @param element
+    *           The element in which an attribute is to be parsed.
+    * @param attributeName
+    *           The action name for which the value is to be parsed.
+    * @return A string which is evaluated :
+    *         <ul>
+    *         <li>either using a specific case (e.g. asc/desc)</li>
+    *         <li>or using the default value if the expression to parse is null
+    *         </li>
+    *         <li>or using the Standard Thymeleaf Expression in all other cases
+    *         </li>
+    *         </ul>
+    */
+   public static String parseDatatablesStringAttribute(Arguments arguments, Element element, String action) {
+
+      String value = DataTablesDialect.getDatatablesAttributeValue(element, action);
+
+      return parseStringAttribute(arguments, value);
    }
 
    /**
@@ -148,22 +261,10 @@ public class AttributeUtils {
 
       String value = element.getAttributeValue(attributeName);
 
-      // Handling null value
-      if (value == null) {
-         return null;
-      }
-
-      if (stringRegex.matcher(value.trim().toLowerCase()).find()) {
-         return value.trim().toLowerCase();
-      }
-
-      // Default behaviour
-      return processStandardExpression(arguments, value, String.class);
+      return parseStringAttribute(arguments, value);
    }
-
-   public static String forceParsingStringAttribute(Arguments arguments, Element element, String attributeName) {
-
-      String value = element.getAttributeValue(attributeName);
+   
+   private static String forceParsingStringAttribute(Arguments arguments, String value) {
 
       if (value == null) {
          return null;
@@ -174,6 +275,71 @@ public class AttributeUtils {
       }
 
       return String.valueOf(getProcessedAttribute(arguments, value));
+   }
+
+   public static String forceParsingDatatablesStringAttribute(Arguments arguments, Element element, String action) {
+
+      String value = DataTablesDialect.getDatatablesAttributeValue(element, action);
+
+      return forceParsingStringAttribute(arguments, value);
+   }
+
+   public static String forceParsingStringAttribute(Arguments arguments, Element element, String attributeName) {
+
+      String value = element.getAttributeValue(attributeName);
+
+      return forceParsingStringAttribute(arguments, value);
+   }
+
+   /**
+    * <p>
+    * Parses the value of an attribute according to the provided {@code clazz}.
+    * </p>
+    * 
+    * @param arguments
+    *           Thymeleaf {@link Arguments}
+    * @param element
+    *           The element in which an attribute is to be parsed.
+    * @param attributeName
+    *           The attribute name for which the value is to be parsed.
+    * @param clazz
+    *           The {@link Class} in which the value of the given attribute name
+    *           is to be parsed.
+    * @return the default value if the expression to parse is null or the value
+    *         of the Thymeleaf Standard expression processing.
+    */
+   private static <T> T parseAttribute(Arguments arguments, String value, Class<T> clazz) {
+
+      // Handling null value
+      if (value == null) {
+         return null;
+      }
+
+      // Default behaviour
+      return processStandardExpression(arguments, value, clazz);
+   }
+
+   /**
+    * <p>
+    * Parses the value of an attribute according to the provided {@code clazz}.
+    * </p>
+    * 
+    * @param arguments
+    *           Thymeleaf {@link Arguments}
+    * @param element
+    *           The element in which an attribute is to be parsed.
+    * @param attributeName
+    *           The attribute name for which the value is to be parsed.
+    * @param clazz
+    *           The {@link Class} in which the value of the given attribute name
+    *           is to be parsed.
+    * @return the default value if the expression to parse is null or the value
+    *         of the Thymeleaf Standard expression processing.
+    */
+   public static <T> T parseDatatablesAttribute(Arguments arguments, Element element, String action, Class<T> clazz) {
+
+      String value = DataTablesDialect.getDatatablesAttributeValue(element, action);
+      return parseAttribute(arguments, value, clazz);
    }
 
    /**
@@ -196,14 +362,7 @@ public class AttributeUtils {
    public static <T> T parseAttribute(Arguments arguments, Element element, String attributeName, Class<T> clazz) {
 
       String value = element.getAttributeValue(attributeName);
-
-      // Handling null value
-      if (value == null) {
-         return null;
-      }
-
-      // Default behaviour
-      return processStandardExpression(arguments, value, clazz);
+      return parseAttribute(arguments, value, clazz);
    }
 
    /**

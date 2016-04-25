@@ -83,14 +83,14 @@ public class TbodyElProcessor extends AbstractElProcessor {
 
                if (trChildTag.hasAttribute("th:each")) {
 
-                  trChildTag.setAttribute(DataTablesDialect.DIALECT_PREFIX + ":data", "internalUse");
+                  trChildTag.setAttribute(DataTablesDialect.getXMLDatatablesAttribute("data"), "internalUse");
 
                   for (Node grandchild : trChildTag.getChildren()) {
 
                      if (grandchild != null && grandchild instanceof Element) {
 
                         Element tdChildTag = (Element) grandchild;
-                        tdChildTag.setAttribute(DataTablesDialect.DIALECT_PREFIX + ":data", "internalUse");
+                        tdChildTag.setAttribute(DataTablesDialect.getXMLDatatablesAttribute("data"), "internalUse");
 
                         // The td nodes must be processed too (for
                         // HtmlColumn creation)
@@ -103,9 +103,7 @@ public class TbodyElProcessor extends AbstractElProcessor {
       }
 
       // Housekeeping
-      if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":data")) {
-         element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":data");
-      }
+      DataTablesDialect.removeDatatablesAttributeIfExists(element, "data");
 
       return ProcessorResult.ok();
    }

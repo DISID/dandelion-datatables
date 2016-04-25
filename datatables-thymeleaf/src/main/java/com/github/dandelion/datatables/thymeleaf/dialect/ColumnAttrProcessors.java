@@ -89,7 +89,7 @@ public enum ColumnAttrProcessors {
 
    public AbstractColumnAttrProcessor getProcessor() {
       AttributeNameProcessorMatcher matcher = new AttributeNameProcessorMatcher(attributeName, elementNameFilter,
-            DataTablesDialect.DIALECT_PREFIX + ":data", "internalUse");
+           DataTablesDialect.getDatatableAtributesByNameFilter("data", "internalUse"));
       try {
          return processorClass.getDeclaredConstructor(IAttributeNameProcessorMatcher.class).newInstance(matcher);
       }

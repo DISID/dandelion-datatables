@@ -52,8 +52,8 @@ public class DivExtraHtmlFinalizerElProcessor extends AbstractElProcessor {
       Map<String, Map<ConfType, Object>> configs = (Map<String, Map<ConfType, Object>>) RequestUtils.getFromRequest(
             DataTablesDialect.INTERNAL_BEAN_CONFIGS, request);
 
-      String tableId = ((Element) element.getParent()).getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":conf");
-      String uid = element.getAttributeValue(DataTablesDialect.DIALECT_PREFIX + ":uid");
+      String tableId = DataTablesDialect.getDatatablesAttributeValue(element, "conf");
+      String uid = DataTablesDialect.getDatatablesAttributeValue(element, "uid");
 
       if (configs != null) {
          if (configs.containsKey(tableId)) {
@@ -65,8 +65,13 @@ public class DivExtraHtmlFinalizerElProcessor extends AbstractElProcessor {
                   if (extraHtml.getUid().equals(uid)) {
 
                      Element e = DomUtils.findElement((Element) element.getParent(), "div",
-                           DataTablesDialect.DIALECT_PREFIX + ":uid", uid);
+                           DataTablesDialect.getXMLDatatablesAttribute("uid"), uid);
 
+                     if (e == null) {
+                         e = DomUtils.findElement((Element) element.getParent(), "div",
+                                 DataTablesDialect.getHTML5DatatablesAttribute("uid"), uid);
+                     }
+                     
                      StringBuilder sb = new StringBuilder();
                      for (Node child : e.getChildren()) {
                         sb.append(DOMUtils.getHtml5For(child).replaceAll("[\n\r]", "").trim());

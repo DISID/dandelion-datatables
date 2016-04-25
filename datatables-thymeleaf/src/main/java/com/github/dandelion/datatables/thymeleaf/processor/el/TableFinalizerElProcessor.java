@@ -200,8 +200,9 @@ public class TableFinalizerElProcessor extends AbstractElProcessor {
          }
       }
       else {
-         logger.debug("No configuration to apply, i.e. no '" + DataTablesDialect.DIALECT_PREFIX
-               + ":conf' has been found in the current template.");
+         logger.debug("No configuration to apply, i.e. no '" + DataTablesDialect.getXMLDatatablesAttribute("conf")
+         	   + "' or '" + DataTablesDialect.getHTML5DatatablesAttribute("conf")
+               + "' has been found in the current template.");
       }
 
       // The config node (the one with the dt:conf attribute), if it exists

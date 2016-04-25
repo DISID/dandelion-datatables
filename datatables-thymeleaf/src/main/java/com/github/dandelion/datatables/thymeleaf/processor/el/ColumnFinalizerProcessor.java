@@ -95,9 +95,7 @@ public class ColumnFinalizerProcessor extends AbstractElProcessor {
       }
 
       // Let's clean the TR attributes
-      if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":data")) {
-         element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":data");
-      }
+      DataTablesDialect.removeDatatablesAttributeIfExists(element, "data");
 
       return ProcessorResult.ok();
    }

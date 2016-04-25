@@ -29,6 +29,9 @@
  */
 package com.github.dandelion.datatables.thymeleaf.processor.el;
 
+import static com.github.dandelion.datatables.thymeleaf.dialect.DataTablesDialect.hasDatatablesAttribute;
+import static com.github.dandelion.datatables.thymeleaf.dialect.DataTablesDialect.removeDatatablesAttribute;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +47,6 @@ import com.github.dandelion.datatables.core.export.ReservedFormat;
 import com.github.dandelion.datatables.core.html.HtmlColumn;
 import com.github.dandelion.datatables.core.html.HtmlRow;
 import com.github.dandelion.datatables.core.html.HtmlTable;
-import com.github.dandelion.datatables.thymeleaf.dialect.DataTablesDialect;
 import com.github.dandelion.datatables.thymeleaf.processor.AbstractElProcessor;
 import com.github.dandelion.datatables.thymeleaf.util.AttributeUtils;
 
@@ -83,48 +85,48 @@ public class TdElProcessor extends AbstractElProcessor {
          HtmlColumn column = null;
          String content = null;
 
-         if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":csv")
-               || element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":xml")
-               || element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":pdf")
-               || element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":xls")
-               || element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":xlsx")) {
+         if (hasDatatablesAttribute(element, "csv")
+               || hasDatatablesAttribute(element, "xml")
+               || hasDatatablesAttribute(element, "pdf")
+               || hasDatatablesAttribute(element, "xls")
+               || hasDatatablesAttribute(element, "xlsx")) {
 
-            if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":csv")) {
-               content = AttributeUtils.parseAttribute(arguments, element, DataTablesDialect.DIALECT_PREFIX + ":csv",
+            if (hasDatatablesAttribute(element, "csv")) {
+               content = AttributeUtils.parseDatatablesAttribute(arguments, element, "csv",
                      String.class);
-               element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":csv");
+               removeDatatablesAttribute(element, "csv");
                column = new HtmlColumn(ReservedFormat.CSV);
                column.setContent(new StringBuilder(content));
                htmlTable.getLastBodyRow().addColumn(column);
             }
-            if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":xml")) {
-               content = AttributeUtils.parseAttribute(arguments, element, DataTablesDialect.DIALECT_PREFIX + ":xml",
+            if (hasDatatablesAttribute(element, "xml")) {
+               content = AttributeUtils.parseDatatablesAttribute(arguments, element, "xml",
                      String.class);
-               element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":xml");
+               removeDatatablesAttribute(element, "xml");
                column = new HtmlColumn(ReservedFormat.XML);
                column.setContent(new StringBuilder(content));
                htmlTable.getLastBodyRow().addColumn(column);
             }
-            if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":pdf")) {
-               content = AttributeUtils.parseAttribute(arguments, element, DataTablesDialect.DIALECT_PREFIX + ":pdf",
+            if (hasDatatablesAttribute(element, "pdf")) {
+               content = AttributeUtils.parseDatatablesAttribute(arguments, element, "pdf",
                      String.class);
-               element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":pdf");
+               removeDatatablesAttribute(element, "pdf");
                column = new HtmlColumn(ReservedFormat.PDF);
                column.setContent(new StringBuilder(content));
                htmlTable.getLastBodyRow().addColumn(column);
             }
-            if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":xls")) {
-               content = AttributeUtils.parseAttribute(arguments, element, DataTablesDialect.DIALECT_PREFIX + ":xls",
+            if (hasDatatablesAttribute(element, "xls")) {
+               content = AttributeUtils.parseDatatablesAttribute(arguments, element, "xls",
                      String.class);
-               element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":xls");
+               removeDatatablesAttribute(element, "xls");
                column = new HtmlColumn(ReservedFormat.XLS);
                column.setContent(new StringBuilder(content));
                htmlTable.getLastBodyRow().addColumn(column);
             }
-            if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":xlsx")) {
-               content = AttributeUtils.parseAttribute(arguments, element, DataTablesDialect.DIALECT_PREFIX + ":xlsx",
+            if (hasDatatablesAttribute(element, "xlsx")) {
+               content = AttributeUtils.parseDatatablesAttribute(arguments, element, "xlsx",
                      String.class);
-               element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":xlsx");
+               removeDatatablesAttribute(element, "xlsx");
                column = new HtmlColumn(ReservedFormat.XLSX);
                column.setContent(new StringBuilder(content));
                htmlTable.getLastBodyRow().addColumn(column);
@@ -143,8 +145,8 @@ public class TdElProcessor extends AbstractElProcessor {
       }
 
       // Remove internal attribute
-      if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":data")) {
-         element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":data");
+      if (hasDatatablesAttribute(element, "data")) {
+         removeDatatablesAttribute(element, "data");
       }
 
       return ProcessorResult.OK;

@@ -127,7 +127,7 @@ public class TableInitializerElProcessor extends AbstractElProcessor {
    private void processMarkup(Element element) {
 
       // Housekeeping
-      element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":table");
+	  DataTablesDialect.removeDatatablesAttribute(element, "table");
 
       // Markers on THEAD and TBODY tags
       for (Node child : element.getChildren()) {
@@ -138,7 +138,7 @@ public class TableInitializerElProcessor extends AbstractElProcessor {
             String childTagName = childTag.getNormalizedName();
 
             if (childTagName.equals("thead") || childTagName.equals("tbody")) {
-               childTag.setAttribute(DataTablesDialect.DIALECT_PREFIX + ":data", "internalUse");
+               childTag.setAttribute(DataTablesDialect.getXMLDatatablesAttribute("data"), "internalUse");
             }
 
             childTag.setProcessable(true);
@@ -147,7 +147,7 @@ public class TableInitializerElProcessor extends AbstractElProcessor {
 
       // "Finalizing div"
       Element div = new Element("div");
-      div.setAttribute(DataTablesDialect.DIALECT_PREFIX + ":tmp", "internalUse");
+      div.setAttribute(DataTablesDialect.getXMLDatatablesAttribute("tmp"), "internalUse");
       div.setRecomputeProcessorsImmediately(true);
       element.getParent().insertAfter(element, div);
    }

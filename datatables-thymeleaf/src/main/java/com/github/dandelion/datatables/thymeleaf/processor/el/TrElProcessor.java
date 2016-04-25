@@ -76,9 +76,7 @@ public class TrElProcessor extends AbstractElProcessor {
       }
 
       // Remove internal attribute
-      if (element.hasAttribute(DataTablesDialect.DIALECT_PREFIX + ":data")) {
-         element.removeAttribute(DataTablesDialect.DIALECT_PREFIX + ":data");
-      }
+      DataTablesDialect.removeDatatablesAttributeIfExists(element, "data");
 
       return ProcessorResult.OK;
    }
